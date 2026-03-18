@@ -49,7 +49,7 @@ extern "C"
 */
 fp32 fric_refree_para = 0.2;
 
-fp32 grigger_speed_to_radio = 1.5;
+fp32 grigger_speed_to_radio = 3.5;
 
 //通过读取裁判数据,直接修改射速和射频等级
 //射速等级  摩擦电机
@@ -295,6 +295,49 @@ void Shoot::set_mode()
     //     shoot_mode = SHOOT_STOP;
     // }
 
+
+    /*---24赛季鼠标操控，会影响摩擦轮，暂时注释，比赛开启*/
+    // static uint16_t longtime_shoot;
+
+    // if (gimbal.gimbal_behaviour_mode == GIMBAL_ABSOLUTE_ANGLE)
+    // {
+        // if (shoot_rc->mouse.press_l == 1) //这里判断左键是否按下
+    // {
+        // if (shoot.shoot_mode == SHOOT_STOP)
+        // {
+            // shoot.shoot_mode = SHOOT_READY_FRIC;
+            // /* code */
+        // }
+        // if (shoot.shoot_mode == SHOOT_READY_BULLET)
+        // {
+            // longtime_shoot ++ ;
+            // /* code */
+        // }
+        // if (longtime_shoot == 1000) //左键长按计时 ，直接切换连续射击
+        // {
+            // shoot.shoot_mode = SHOOT_CONTINUE_BULLET;
+            // /* code */
+        // }
+        // /* code */
+    // }
+    // else //执行停止射击
+    // {
+        // if(longtime_shoot>0)
+        // {
+            // longtime_shoot--;
+            // shoot.shoot_mode = SHOOT_READY_BULLET;
+        // }
+        // else
+        // {
+            // shoot.shoot_mode = SHOOT_STOP;
+        // }
+    // }
+        // /* code */
+    // }
+    
+    
+    
+
     static uint16_t last_cover_key_value = 0;
 
     if (if_key_singal_pessed(shoot_rc->key.v, last_cover_key_value, KEY_PRESSED_SHOOT_COVER) && cover_mode == COVER_OPEN_DONE) //单击R并且开启完毕
@@ -491,7 +534,7 @@ void Shoot::set_control()
         if (key == SWITCH_TRIGGER_OFF)
         {
             //设置拨弹轮的拨动速度,并开启堵转反转处理
-            trigger_motor.speed_set = shoot_grigger_grade[1] * SHOOT_TRIGGER_DIRECTION;
+            trigger_motor.speed_set = shoot_grigger_grade[4] * SHOOT_TRIGGER_DIRECTION;
         }
         else
         {
@@ -514,7 +557,7 @@ void Shoot::set_control()
     else if (shoot_mode == SHOOT_CONTINUE_BULLET)
     {
         //设置拨弹轮的拨动速度,并开启堵转反转处理
-        trigger_motor.speed_set = shoot_grigger_grade[2] * SHOOT_TRIGGER_DIRECTION;
+        trigger_motor.speed_set = shoot_grigger_grade[4] * SHOOT_TRIGGER_DIRECTION;
     }
     else if (shoot_mode == SHOOT_DONE)
     {
@@ -628,14 +671,14 @@ void Shoot::cooling_ctrl()
     
     //连发模式下，对拨盘电机输入控制值
     if (shoot_mode == SHOOT_CONTINUE_BULLET)
-        trigger_motor.speed_set = shoot_grigger_grade[2] * SHOOT_TRIGGER_DIRECTION;
+        trigger_motor.speed_set = shoot_grigger_grade[1] * SHOOT_TRIGGER_DIRECTION;
     //对摩擦轮电机输入控制值
     fric_motor[LEFT_FRIC].speed_set = shoot_fric_grade[fric_speed_grade];
     fric_motor[RIGHT_FRIC].speed_set = shoot_fric_grade[fric_speed_grade];
     
-    if (snail_pwm[0] < 1400){snail_pwm[0] ++;}
-    if (snail_pwm[1] < 1400){snail_pwm[1] ++;}
-    if (snail_pwm[2] < 1400){snail_pwm[2] ++;}
+    if (snail_pwm[0] < 1350){snail_pwm[0] ++;}
+    if (snail_pwm[1] < 1350){snail_pwm[1] ++;}
+    if (snail_pwm[2] < 1350){snail_pwm[2] ++;}
     
     
 
@@ -792,7 +835,7 @@ void Shoot::shoot_bullet_control()
     if (rad_format(trigger_motor.angle_set - trigger_motor.angle) > 0.05f)
     {
         //没到达一直设置旋转速度
-        trigger_motor.speed_set = shoot_grigger_grade[1] * SHOOT_TRIGGER_DIRECTION;
+        trigger_motor.speed_set = shoot_grigger_grade[4] * SHOOT_TRIGGER_DIRECTION;
         trigger_motor_turn_back();
     }
     else

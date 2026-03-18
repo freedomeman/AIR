@@ -44,22 +44,22 @@ void Communicate::run()
     //vision_send_data(1);
 
     //向底盘发送遥控器和云台数据
-    int16_t temp_ch0, temp_ch2, temp_ch3;
-    uint16_t temp_v;
-    uint8_t temp_s0, temp_gimbal_behaviour_mode;
-    fp32 temp_gimbal_yaw_angle;
+    // int16_t temp_ch0, temp_ch2, temp_ch3;
+    // uint16_t temp_v;
+    // uint8_t temp_s0, temp_gimbal_behaviour_mode;
+    // fp32 temp_gimbal_yaw_angle;
 
-    temp_ch0 = remote_control.rc_ctrl.rc.ch[0];
-    temp_ch2 = remote_control.rc_ctrl.rc.ch[2];
-    temp_ch3 = remote_control.rc_ctrl.rc.ch[3];
-    temp_v = remote_control.rc_ctrl.key.v;
-    temp_s0 = remote_control.rc_ctrl.rc.s[0];
+    // temp_ch0 = remote_control.rc_ctrl.rc.ch[0];
+    // temp_ch2 = remote_control.rc_ctrl.rc.ch[2];
+    // temp_ch3 = remote_control.rc_ctrl.rc.ch[3];
+    // temp_v = remote_control.rc_ctrl.key.v;
+    // temp_s0 = remote_control.rc_ctrl.rc.s[0];
 
-    temp_gimbal_behaviour_mode = gimbal.gimbal_behaviour_mode;
-    temp_gimbal_yaw_angle = gimbal.gimbal_yaw_motor.relative_angle;
+    // temp_gimbal_behaviour_mode = gimbal.gimbal_behaviour_mode;
+    // temp_gimbal_yaw_angle = gimbal.gimbal_yaw_motor.relative_angle;
 
-    can_receive.send_rc_board_com(temp_ch0, temp_ch2, temp_ch3, temp_v);
-    can_receive.send_gimbal_board_com(temp_s0, temp_gimbal_behaviour_mode, temp_gimbal_yaw_angle);
+    // can_receive.send_rc_board_com(temp_ch0, temp_ch2, temp_ch3, temp_v);
+    // can_receive.send_gimbal_board_com(temp_s0, temp_gimbal_behaviour_mode, temp_gimbal_yaw_angle);
 }
 
 #ifdef __cplusplus //告诉编译器，这部分代码按C语言的格式进行编译，而不是C++的
@@ -199,6 +199,17 @@ extern "C"
             
 
             //云台机构电机
+            case CAN_PITCH_GIMOTOR_ID:  // 需要定义对应的CAN ID
+                //can_receive.get_mit_gimmotor_measure(0, rx_data);  // 假设使用0号电机
+                can_receive.get_gimbal_gimmotor_measure(0, rx_data);
+                //detect_hook(GIMBAL_GIMMOTOR_TOE);  // 需要定义对应的检测钩子
+            break;
+
+            case CAN_YAW_GIMOTOR_ID:  // 需要定义对应的CAN ID
+                can_receive.get_gimbal_gimmotor_measure(1, rx_data);  // 假设使用0号电机
+                //detect_hook(GIMBAL_GIMMOTOR_TOE);  // 需要定义对应的检测钩子
+            break;
+
             case CAN_YAW_MOTOR_ID:
                 can_receive.get_gimbal_motor_measure(0, rx_data);
                 detect_hook(GIMBAL_YAW_MOTOR_TOE);
@@ -246,24 +257,28 @@ extern "C"
             //     detect_hook(GIMBAL_YAW_MOTOR_TOE);
             //     break;
                 //发射机构电机
-            case CAN_LEFT_FRIC_MOTOR_ID:
-                can_receive.get_shoot_motor_measure(0, rx_data);
-                detect_hook(CAN_LEFT_FRIC_MOTOR_ID);
-                break;
+            // case CAN_LEFT_FRIC_MOTOR_ID:
+            //     can_receive.get_shoot_motor_measure(0, rx_data);
+            //     detect_hook(CAN_LEFT_FRIC_MOTOR_ID);
+            //     break;
 
-            case CAN_RIGHT_FRIC_MOTOR_ID:
-                can_receive.get_shoot_motor_measure(1, rx_data);
-                detect_hook(CAN_RIGHT_FRIC_MOTOR_ID);
-                break;
+            // case CAN_RIGHT_FRIC_MOTOR_ID:
+            //     can_receive.get_shoot_motor_measure(1, rx_data);
+            //     detect_hook(CAN_RIGHT_FRIC_MOTOR_ID);
+            //     break;
 
             case CAN_TRIGGER_MOTOR_ID:
                 can_receive.get_shoot_motor_measure(2, rx_data);
                 detect_hook(CAN_TRIGGER_MOTOR_ID);
                 break;
-            case CAN_COVER_MOTOR_ID:
-                can_receive.get_shoot_motor_measure(3, rx_data);
-                detect_hook(CAN_COVER_MOTOR_ID);
-                break;
+            case CAN_IMU_QUET_BORAM_COM_ID:
+                can_receive.get_imu_quet(rx_data);
+            case CAN_IMU_ANGLE_BORAM_COM_ID:
+                can_receive.get_imu_angle(rx_data);
+            // case CAN_COVER_MOTOR_ID:
+            //     can_receive.get_shoot_motor_measure(3, rx_data);
+            //     detect_hook(CAN_COVER_MOTOR_ID);
+            //     break;
 
             default:
             {
